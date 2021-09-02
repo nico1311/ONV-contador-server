@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response
 from pymysql.err import IntegrityError
 
 from ..logger import logger
+from ..auth import oauth2_scheme
 from ..database import db
 from ..models.sucursal import Sucursal
 
@@ -19,7 +20,7 @@ async def get_all_sucursales():
         raise HTTPException(status_code=500, detail="Error no especificado")
 
 @router.get("/sucursales/{id}", tags=["sucursales"])
-async def get_sucursal(id=int):
+async def get_sucursal(id=int, token: str = Depends(oauth2_scheme)):
     '''Obtener sucursal por ID'''
     query = "SELECT * FROM `sucursales` WHERE `id` = :id"
     try:
