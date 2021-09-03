@@ -9,7 +9,7 @@ from ..models.sucursal import Sucursal
 
 router = APIRouter()
 
-@router.get("/sucursales", tags=["sucursales"])
+@router.get("/sucursales", tags=["Sucursales"])
 async def get_all_sucursales():
 	'''Obtener todas las sucursales'''
 	query = "SELECT * FROM `sucursales`"
@@ -20,7 +20,7 @@ async def get_all_sucursales():
 		logger.exception(e)
 		raise HTTPException(status_code=500, detail="Error no especificado")
 
-@router.get("/sucursales/capacidad", tags=["sucursales"])
+@router.get("/sucursales/capacidad", tags=["Sucursales"])
 async def get_sucursales_capacidad():
 	'''Obtener la capacidad total y ocupación actual de todas las sucursales'''
 	query = "SELECT * FROM `sucursales_capacidad`"
@@ -31,7 +31,7 @@ async def get_sucursales_capacidad():
 		logger.exception(e)
 		raise HTTPException(status_code=500, detail="Error no especificado")  
 
-@router.get("/sucursales/{id}", tags=["sucursales"])
+@router.get("/sucursales/{id}", response_model=Sucursal, tags=["Sucursales"])
 async def get_sucursal(id=int):
 	'''Obtener sucursal por ID'''
 	query = "SELECT * FROM `sucursales` WHERE `id` = :id"
@@ -47,7 +47,7 @@ async def get_sucursal(id=int):
 		logger.exception(e)
 		raise HTTPException(status_code=500, detail="Error no especificado")      
 
-@router.get("/sucursales/{id}/capacidad", tags=["sucursales"])
+@router.get("/sucursales/{id}/capacidad", tags=["Sucursales"])
 async def get_sucursal_capacidad(id=int):
 	'''Obtener la capacidad total y ocupación actual de una sucursal'''
 	query = "SELECT * FROM `sucursales` WHERE `id` = :id"
@@ -67,7 +67,7 @@ async def get_sucursal_capacidad(id=int):
 		logger.exception(e)
 		raise HTTPException(status_code=500, detail="Error no especificado")
 
-@router.post("/sucursales", status_code=201, tags=["sucursales"])
+@router.post("/sucursales", response_model=Sucursal, status_code=201, tags=["Sucursales"])
 async def create_sucursal(sucursal: Sucursal, user: User = Depends(get_current_user)):
 	'''Crear una sucursal'''
 	if (user.role != 1):
@@ -84,7 +84,7 @@ async def create_sucursal(sucursal: Sucursal, user: User = Depends(get_current_u
 		logger.exception(e)
 		raise HTTPException(status_code=500, detail="Error no especificado")
 
-@router.put("/sucursales/{id}", status_code=200, tags=["sucursales"])
+@router.put("/sucursales/{id}", response_model=Sucursal, status_code=200, tags=["Sucursales"])
 async def update_sucursal(sucursal: Sucursal, id=int, user: User = Depends(get_current_user)):
 	'''Actualizar información de una sucursal'''
 	if (user.role != 1):
@@ -101,7 +101,7 @@ async def update_sucursal(sucursal: Sucursal, id=int, user: User = Depends(get_c
 		logger.exception(e)
 		raise HTTPException(status_code=500, detail="Error no especificado")
 
-@router.delete("/sucursales/{id}", response_class=Response, status_code=204, tags=["sucursales"])
+@router.delete("/sucursales/{id}", response_class=Response, status_code=204, tags=["Sucursales"])
 async def delete_sucursal(id=int, user: User = Depends(get_current_user)):
 	'''Eliminar una sucursal'''
 	if (user.role != 1):

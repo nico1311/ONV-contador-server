@@ -12,9 +12,9 @@ from ..models.sucursal import Sucursal
 
 router = APIRouter()
 
-@router.get("/sucursales/{id}/eventos", tags=["eventos"])
+@router.get("/sucursales/{id}/eventos", tags=["Eventos"])
 async def get_sucursal_events(id=int, user: User = Depends(get_current_user)):
-	'''Obtener sucursal por ID'''
+	'''Obtener eventos de sucursal'''
 	query = "SELECT * FROM `sucursales` WHERE `id` = :id"
 	try:
 		sucursal = await db.fetch_one(query=query, values={"id": id})
@@ -34,9 +34,9 @@ async def get_sucursal_events(id=int, user: User = Depends(get_current_user)):
 		logger.exception(e)
 		raise HTTPException(status_code=500, detail="Error no especificado")
 
-@router.post("/sucursales/{id}/eventos", status_code=201, tags=["eventos"])
+@router.post("/sucursales/{id}/eventos", status_code=201, tags=["Eventos"])
 async def get_sucursal_events(request: Request, id=int, user: User = Depends(get_current_user)):
-	'''Obtener sucursal por ID'''
+	'''Crear evento (endpoint utilizado por el frontend)'''
 	query = "SELECT * FROM `sucursales` WHERE `id` = :id"
 	try:
 		sucursal = await db.fetch_one(query=query, values={"id": id})
@@ -66,9 +66,9 @@ async def get_sucursal_events(request: Request, id=int, user: User = Depends(get
 		logger.exception(e)
 		raise HTTPException(status_code=500, detail="Error no especificado")
 
-@router.post("/sucursales/{id}/eventos/hw", tags=["eventos"])
+@router.post("/sucursales/{id}/eventos/hw", tags=["Eventos"])
 async def create_sucursal_event_hw(request: Request, id=int):
-	'''Obtener sucursal por ID'''
+	'''Crear evento (endpoint utilizado por los sensores)'''
 	query = "SELECT * FROM `sucursales` WHERE `id` = :id"
 	try:
 		sucursal = await db.fetch_one(query=query, values={"id": id})

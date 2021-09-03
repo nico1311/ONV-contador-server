@@ -4,7 +4,7 @@ from .logger import logger
 from .database import db
 from .routers import auth, eventos, sucursales, users
 
-app = FastAPI()
+app = FastAPI(title="ONV-contador-server", version="0.1.0")
 
 app.include_router(auth.router)
 app.include_router(eventos.router)
