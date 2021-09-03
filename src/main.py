@@ -2,11 +2,12 @@ from fastapi import FastAPI
 
 from .logger import logger
 from .database import db
-from .routers import auth, sucursales, users
+from .routers import auth, eventos, sucursales, users
 
 app = FastAPI()
 
 app.include_router(auth.router)
+app.include_router(eventos.router)
 app.include_router(sucursales.router)
 app.include_router(users.router)
 

@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from pymysql.err import IntegrityError
 
 from ..logger import logger
-from ..auth import oauth2_scheme
+from ..auth import get_current_user
 from ..database import db
+from ..models.user import User
 from ..models.sucursal import Sucursal
 
 router = APIRouter()
@@ -20,7 +21,7 @@ async def get_all_sucursales():
         raise HTTPException(status_code=500, detail="Error no especificado")
 
 @router.get("/sucursales/{id}", tags=["sucursales"])
-async def get_sucursal(id=int, token: str = Depends(oauth2_scheme)):
+async def get_sucursal(id=int):
     '''Obtener sucursal por ID'''
     query = "SELECT * FROM `sucursales` WHERE `id` = :id"
     try:
@@ -41,13 +42,16 @@ async def get_sucursal_capacidad(id=int):
     return {"capacidad": 20}
 
 @router.post("/sucursales", status_code=201, tags=["sucursales"])
-async def create_sucursal(sucursal: Sucursal):
+async def create_sucursal(sucursal: Sucursal, user: User = Depends(get_current_user)):
     '''Crear una sucursal'''
-    # TODO: autenticación
+    if (user.role is not 1):
+        raise HTTPException(status_code=403, detail="Usuario no autorizado a crear sucursales")
     query = "INSERT INTO `sucursales` (nombre, direccion, localidad, lat, lng, capacidad, encargado) VALUES (:nombre, :direccion, :localidad, :lat, :lng, :capacidad, :encargado)"
     try:
-        await db.execute(query=query, values=sucursal.dict())
-        return sucursal.dict()
+        sucursal_dict = sucursal.dict()
+        new_id = await db.execute(query=query, values=sucursal_dict)
+        sucursal_dict['id'] = new_id
+        return sucursal_dict
     except IntegrityError:
         raise HTTPException(status_code=400, detail="Usuario encargado no existe")
     except Exception as e:
@@ -57,9 +61,10 @@ async def create_sucursal(sucursal: Sucursal):
 ## TODO: endpoint para modificar una sucursal (update)
 
 @router.delete("/sucursales/{id}", response_class=Response, status_code=204, tags=["sucursales"])
-async def delete_sucursal(id=int):
+async def delete_sucursal(id=int, user: User = Depends(get_current_user)):
     '''Eliminar una sucursal'''
-    # TODO: autenticación
+    if (user.role is not 1):
+        raise HTTPException(status_code=403, detail="Usuario no autorizado a eliminar sucursales")
     query = "DELETE FROM `sucursales` WHERE `id` = :id"
     try:
         await db.execute(query=query, values={"id": id})
