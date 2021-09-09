@@ -1,7 +1,6 @@
 from datetime import datetime
 from decouple import config
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from hashlib import sha1
 from pymysql.err import IntegrityError
 
 from ..logger import logger
@@ -74,9 +73,7 @@ async def create_sucursal_event_hw(request: Request, id=int):
 		sucursal = await db.fetch_one(query=query, values={"id": id})
 		if sucursal:
 			hw_secret = config('HW_SECRET')
-			api_key = sha1("{id}:{secret}".format(id=id, secret=hw_secret).encode()).hexdigest()
-			key_header = request.headers.get('x-api-key')
-			if key_header == api_key:
+			if key_header == hw_secret:
 				body = await request.json()
 				evt_type = int(body['tipo'])
 				timestamp = datetime.utcnow().isoformat()
